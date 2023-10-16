@@ -1,0 +1,22 @@
+name: Summon Client CI/CD
+on:
+  # We must do a trigger on a push: instead of a types: closed so GitHub Secrets
+  # are available to the workflow run
+  push:
+    branches:
+      - 'master'
+  workflow_dispatch:
+
+env:
+  BUILD_TAG: ${{ github.ref_name }}-${{ github.run_number }}
+jobs:
+  build:
+    name: Trigger Build and Push of Docker Image
+    runs-on: [self-hosted, gradle5.6]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Nexus Push
+        run: |
+          gradle -PnexusUrl='${{ secrets.NEXUS_URL }}' -PnexusUserName='${{ secrets.NEXUS_USERNAME }}' -PnexusPassword='${{ secrets.NEXUS_PASSWORD }}' publishMavenPublicationToNexusRepository
+          # /usr/bin/gradle -PreleaseVersion=$BUILD_TAG -PnexusUrl=${{ secrets.NEXUS_URL }} -PnexusUserName=${{ secrets.NEXUS_USERNAME }} -PnexusPassword=${{ secrets.NEXUS_PASSWORD }} publishMavenPublicationToNexusRepository

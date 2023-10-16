@@ -1,0 +1,71 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+}
+
+
+plugins {
+    id 'java-library'
+    id 'net.ltgt.apt' version '0.21'
+
+}
+
+apply plugin: 'java-library'
+apply plugin: 'eclipse'
+apply plugin: "maven-publish"
+
+
+
+group = 'com.greytip'
+
+version = '0.0.16'
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    maven {
+        url "https://nexus.greytip.com/repository/maven-public"
+    }
+    mavenCentral()
+}
+
+dependencies {
+    annotationProcessor "org.projectlombok:lombok:1.18.4"
+    implementation('org.projectlombok:lombok:1.16.12')
+    implementation( 'org.slf4j:slf4j-api:1.7.25')
+    implementation( 'com.squareup.retrofit2:retrofit:2.4.0' )
+    implementation( 'com.squareup.retrofit2:converter-jackson:2.4.0')
+}
+
+task sourceJar(type: Jar) {
+    classifier 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar) {
+    from javadoc
+    classifier = 'javadoc'
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+            artifact sourceJar
+            artifact javadocJar
+        }
+    }
+
+    repositories {
+        maven {
+            url "https://nexus.greytip.com/repository/maven-public"
+            //noinspection GroovyAssignabilityCheck
+            name "nexus"
+            credentials {
+                username 'xx'
+                password 'xx'
+            }
+        }
+    }
+}
